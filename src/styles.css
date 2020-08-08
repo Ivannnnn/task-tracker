@@ -1,0 +1,72 @@
+button {
+  cursor: pointer;
+}
+
+.flex {
+  display: flex;
+}
+.align-center {
+  align-items: center;
+}
+.justify-center {
+  justify-content: center;
+}
+.column {
+  flex-direction: column;
+}
+.grow {
+  flex-grow: 1;
+}
+
+.task-list {
+  width: 560px;
+}
+
+.list {
+  margin: 16px 0;
+}
+
+.list .row {
+  display: flex;
+  border: 1px solid black;
+  margin-top: -1px;
+}
+
+.list .row > div {
+  padding: 6px 12px;
+}
+
+.list .row.active {
+  position: relative;
+  left: 20px;
+}
+
+.task-list .row > div:nth-child(1) {
+  width: 50px;
+}
+.task-list .row > div:nth-child(2) {
+  flex-grow: 1;
+}
+.task-list .row > div:nth-child(3) {
+  width: 50px;
+}
+.task-list .row > div:nth-child(4) {
+  width: 40px;
+}
+
+.list input {
+  width: 100%;
+}
+
+.list button {
+  font-size: 10px;
+  margin: 1px;
+}
+
+.project-list {
+  width: 360px;
+}
+
+.project-list .row > div:nth-child(1) {
+  flex-grow: 1;
+}

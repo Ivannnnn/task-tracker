@@ -1,17 +1,27 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React, { useState, useEffect } from 'react'
+import ReactDOM from 'react-dom'
+import './styles.css'
+import Store from 'store'
+import Projects from 'components/Projects'
+import Tasks from 'components/Tasks'
+import { Switch, Route } from 'wouter'
+
+function App() {
+  const { projectsLoaded, actions } = Store.useContainer()
+
+  useEffect(actions.loadProjects, [])
+
+  return projectsLoaded ? (
+    <Switch>
+      <Route path="/" component={Projects} />
+      <Route path="/:projectId" component={Tasks} />
+    </Switch>
+  ) : null
+}
 
 ReactDOM.render(
-  <React.StrictMode>
+  <Store.Provider>
     <App />
-  </React.StrictMode>,
+  </Store.Provider>,
   document.getElementById('root')
-);
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+)
