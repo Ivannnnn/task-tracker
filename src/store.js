@@ -1,66 +1,38 @@
-import React, { useState, useEffect } from 'react'
 import { createContainer } from 'unstated-next'
-import { uuid, proxyStorage } from 'utils'
 import { useImmer } from 'hooks'
-
-const createProject = () => [uuid(), { title: '', taskIds: [] }]
+import db from 'services/db'
 
 const useStore = () => {
   const [projects, updateProjects] = useImmer()
 
   const actions = {}
 
-  actions.loadProjects = () => {
-    const projects = {}
-    ;(proxyStorage.projectIds || []).forEach((projectId) => {
-      projects[projectId] = proxyStorage[projectId]
-    })
+  actions.loadProjects = async () => {
+    const projects = await db.projects.all()
     updateProjects(() => projects)
   }
 
-  actions.updateProjectTasks = (projectId, taskIds) => {
+  actions.addProject = async () => {
+    const newProject = { title: '' }
+    const id = await db.projects.add(newProject)
     updateProjects((projects) => {
-      projects[projectId].taskIds = taskIds
-      proxyStorage[projectId] = projects[projectId]
-    })
-  }
-
-  actions.addProject = () => {
-    updateProjects((projects) => {
-      const [id, newProject] = createProject()
-      proxyStorage[id] = newProject
-      proxyStorage.projectIds = [...(proxyStorage.projectIds || []), id]
       projects[id] = newProject
     })
   }
 
-  actions.updateProjectTitle = (id, title) => {
+  actions.updateProject = async (id, { title }) => {
+    await db.projects.update(id, { title })
     updateProjects((projects) => {
-      projects[id].title = title
-      proxyStorage[id] = projects[id]
+      Object.assign(projects[id], { title })
     })
   }
 
-  actions.removeProject = (id) => {
+  actions.removeProject = async (id) => {
+    await db.projects.remove(id)
     updateProjects((projects) => {
-      const tasksToRemove = [...projects[id].taskIds]
       delete projects[id]
-      delete proxyStorage[id]
-      proxyStorage.projectIds = Object.keys(projects)
-
-      tasksToRemove.forEach((taskId) => {
-        delete proxyStorage[taskId]
-      })
     })
   }
-
-  /*
-  on('task:remove', id => {
-    updateProjects(projects => {
-      
-    })
-  })
-*/
 
   return {
     projects,

@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 const padZero = (val, n) =>
   val.toString().length > n ? val : ('0' + val).slice(n * -1)
 
@@ -21,34 +19,11 @@ export function uuid(a) {
     : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, uuid)
 }
 
-function parseIfJSON(str) {
-  try {
-    return JSON.parse(str)
-  } catch (e) {
-    return false
-  }
+export function keyBy(collection, key) {
+  const result = {}
+  collection.forEach((item) => {
+    result[item[key]] = item
+    delete item[key]
+  })
+  return result
 }
-
-export const proxyStorage = new Proxy(
-  {},
-  {
-    get(_, prop) {
-      const data = localStorage[prop]
-      return parseIfJSON(data) || data
-    },
-    set(_, prop, value) {
-      try {
-        typeof value === 'object'
-          ? (localStorage[prop] = JSON.stringify(value))
-          : (localStorage[prop] = value)
-        return true
-      } catch (e) {
-        return false
-      }
-    },
-    deleteProperty(_, prop) {
-      delete localStorage[prop]
-      return true
-    },
-  }
-)

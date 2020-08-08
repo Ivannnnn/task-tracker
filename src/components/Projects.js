@@ -27,7 +27,7 @@ export default function Projects() {
               <div>
                 <Input
                   value={projects[id].title}
-                  onChange={(title) => actions.updateProjectTitle(id, title)}
+                  onChange={(title) => actions.updateProject(id, { title })}
                 />
               </div>
               <div>

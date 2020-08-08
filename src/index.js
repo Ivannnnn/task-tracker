@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import './styles.css'
 import Store from 'store'
@@ -9,7 +9,9 @@ import { Switch, Route } from 'wouter'
 function App() {
   const { projectsLoaded, actions } = Store.useContainer()
 
-  useEffect(actions.loadProjects, [])
+  useEffect(() => {
+    actions.loadProjects()
+  }, [])
 
   return projectsLoaded ? (
     <Switch>
