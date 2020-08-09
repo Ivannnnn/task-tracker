@@ -58,7 +58,7 @@ button {
   width: 100%;
 }
 
-.list button {
+.list button:not(.time) {
   font-size: 10px;
   margin: 1px;
 }

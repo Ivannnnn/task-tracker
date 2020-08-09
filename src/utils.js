@@ -1,7 +1,8 @@
 const padZero = (val, n) =>
   val.toString().length > n ? val : ('0' + val).slice(n * -1)
 
-const startOfDay = (date) => new Date(new Date(date).setHours(0, 0, 0, 0))
+export const startOfDay = (date) =>
+  new Date(new Date(date).setHours(0, 0, 0, 0))
 
 export const secsToTime = (secs) => {
   const mm = new Date(startOfDay(new Date()).getTime() + secs * 1000)
@@ -26,4 +27,18 @@ export function keyBy(collection, key) {
     delete item[key]
   })
   return result
+}
+
+export const classes = (...args) => {
+  return args
+    .map((arg) => {
+      if (arg === null || arg === undefined) return null
+      return typeof arg === 'string'
+        ? arg
+        : Object.keys(arg)
+            .filter((key) => arg[key])
+            .join(' ')
+    })
+    .filter(Boolean)
+    .join(' ')
 }
