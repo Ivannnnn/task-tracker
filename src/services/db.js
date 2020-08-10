@@ -6,10 +6,8 @@ const db = new Dexie('db')
 db.version(1).stores({
   projects: 'id, title',
   projectTasks: 'id, belongsTo', // title, estimate
-  taskTimes: 'id, day, belongsTo', // duration
+  taskTimes: '++id, day, belongsTo', // duration
 })
-
-//taskTimes don't need id, just make them autoincrement
 
 const tasksTransformer = (tasks) => {
   const defaults = { title: '', time: 0, estimate: 0 }
@@ -63,7 +61,7 @@ const tasks = {
 
     return existing
       ? await db.taskTimes.where({ day, belongsTo }).modify({ duration })
-      : await db.taskTimes.put({ id: uuid(), day, duration, belongsTo })
+      : await db.taskTimes.put({ day, duration, belongsTo })
   },
 }
 
