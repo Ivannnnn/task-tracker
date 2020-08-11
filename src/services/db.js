@@ -4,7 +4,7 @@ import { uuid, keyBy, startOfDay } from 'utils'
 const db = new Dexie('db')
 
 db.version(1).stores({
-  projects: 'id, title',
+  projects: 'id, title, order',
   projectTasks: 'id, belongsTo, order', // title, estimate
   taskTimes: '++id, day, belongsTo', // duration
 })
@@ -69,7 +69,8 @@ const tasks = {
 
 const projects = {
   all: async () => keyBy(await db.projects.toArray(), 'id'),
-  add: async ({ id = uuid(), title = '' }) => db.projects.put({ id, title }),
+  add: async ({ id = uuid(), title = '', order }) =>
+    db.projects.put({ id, title, order }),
   update: async (id, props) => db.projects.where({ id }).modify(props),
   remove: async (id) => {
     db.projects.where({ id }).delete()

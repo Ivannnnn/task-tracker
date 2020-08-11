@@ -70,8 +70,8 @@ export default function Tasks({ params: { projectId } }) {
   }
 
   useEffect(() => {
-    projects[projectId] && loadTasks()
-  }, [projectId])
+    projects.byId[projectId] && loadTasks()
+  }, [projects.byId[projectId]])
 
   const updateActiveTaskTime = () => {
     updateTasks((tasks) => {

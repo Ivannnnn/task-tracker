@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react'
+import React, { memo } from 'react'
 import { useLocation } from 'wouter'
 import Store from 'store'
 import Input from 'components/Input'
@@ -8,8 +8,9 @@ export default function Projects() {
   const [location, setLocation] = useLocation()
 
   const onAddNew = () => {
-    const lastProject = projects[Object.keys(projects).pop()]
-    if (!lastProject || lastProject.title.length) actions.addProject('')
+    const lastProject =
+      projects.byId[projects.byOrder[projects.byOrder.length - 1]]
+    lastProject.title !== '' && actions.createProject()
   }
 
   const attemptDelete = (id) => {
@@ -21,12 +22,29 @@ export default function Projects() {
   return (
     <div>
       <div className="list project-list">
-        {Object.keys(projects).map((id) => {
+        {projects.byOrder.map((id, index) => {
           return (
             <div key={id} className="row">
               <div>
+                <button
+                  onClick={() => index > 0 && actions.moveUp(index)}
+                  className="up"
+                >
+                  ↑
+                </button>
+                <button
+                  onClick={() =>
+                    index < projects.byOrder.length - 1 &&
+                    actions.moveDown(index)
+                  }
+                  className="down"
+                >
+                  ↓
+                </button>
+              </div>
+              <div>
                 <Input
-                  value={projects[id].title}
+                  value={projects.byId[id].title}
                   onChange={(title) => actions.updateProject(id, { title })}
                 />
               </div>
@@ -34,7 +52,7 @@ export default function Projects() {
                 <button onClick={() => setLocation('/' + id)}>>></button>
               </div>
               <div>
-                <button onClick={() => attemptDelete(id)}>X</button>
+                <button onClick={() => attemptDelete(index)}>X</button>
               </div>
             </div>
           )

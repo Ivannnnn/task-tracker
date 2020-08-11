@@ -41,7 +41,8 @@ button {
   left: 20px;
 }
 
-.task-list .row > div:nth-child(1) {
+.task-list .row > div:nth-child(1),
+.project-list .row > div:nth-child(1) {
   width: 50px;
 }
 .task-list .row > div:nth-child(2) {
