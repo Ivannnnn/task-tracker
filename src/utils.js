@@ -24,7 +24,6 @@ export function keyBy(collection, key) {
   const result = {}
   collection.forEach((item) => {
     result[item[key]] = item
-    delete item[key]
   })
   return result
 }
@@ -41,4 +40,16 @@ export const classes = (...args) => {
     })
     .filter(Boolean)
     .join(' ')
+}
+
+export const sortBy = (arr, key = false, ascOrDesc = 'asc') => {
+  const multiplier = { asc: -1, desc: 1 }[ascOrDesc]
+  if (!multiplier) throw new Error('3rd parameter must be "asc" or "desc"!')
+  return [...arr].sort((a, b) =>
+    (key ? a[key] : a) < (key ? b[key] : b) ? multiplier : multiplier * -1
+  )
+}
+
+export function arraySwap(arr, from, to) {
+  arr.splice(from, 1, arr.splice(to, 1, arr[from])[0])
 }

@@ -5,7 +5,7 @@ const db = new Dexie('db')
 
 db.version(1).stores({
   projects: 'id, title',
-  projectTasks: 'id, belongsTo', // title, estimate
+  projectTasks: 'id, belongsTo, order', // title, estimate
   taskTimes: '++id, day, belongsTo', // duration
 })
 
@@ -20,7 +20,6 @@ const tasks = {
     const tasks = tasksTransformer(
       await db.projectTasks.where('belongsTo').equals(projectId).toArray()
     )
-
     const times = await db.taskTimes
       .where('belongsTo')
       .anyOf(Object.keys(tasks))
@@ -38,6 +37,7 @@ const tasks = {
     estimate = 0,
     belongsTo,
     time = 0,
+    order,
   }) => {
     return await db.projectTasks.put({
       id,
@@ -45,9 +45,11 @@ const tasks = {
       estimate,
       time,
       belongsTo,
+      order,
     })
   },
-  update: async (id, props) => db.projectTasks.where({ id }).modify(props),
+  update: async (id, props) =>
+    await db.projectTasks.where({ id }).modify(props),
   remove: async (id) => {
     return Promise.all([
       db.projectTasks.where({ id }).delete(),
