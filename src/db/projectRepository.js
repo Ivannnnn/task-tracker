@@ -1,23 +1,26 @@
 import db from './db'
-import { uuid, forEach } from 'utils'
+import { uuid, forEach, sum, groupBy } from 'utils'
+import taskRepository from './taskRepository'
+
+/*
+with: {
+  tasks: async (projects) => {
+    const tasks = await db.tasks
+      .whereIn({ projectId: Object.keys(projects) })
+      .keyBy('id')
+
+    forEach(projects, (project) => {
+      project.tasks = {}
+    })
+
+    forEach(tasks, (task) => {
+      projects[task.projectId].tasks[task.id] = task
+    })
+  },
+},
+*/
 
 const projectRepository = {
-  with: {
-    tasks: async (projects) => {
-      const tasks = await db.tasks
-        .whereIn({ projectId: Object.keys(projects) })
-        .keyBy('id')
-
-      forEach(projects, (project) => {
-        project.tasks = {}
-      })
-
-      forEach(tasks, (task) => {
-        projects[task.projectId].tasks[task.id] = task
-      })
-    },
-  },
-
   get: async (prop = {}) => {
     const query = prop.where ? db.projects.where(prop.where) : db.projects
     const data = await query.keyBy('id')
@@ -38,6 +41,39 @@ const projectRepository = {
   remove: async (id) => {
     return await db.projects.where({ id }).delete()
   },
+
+  getTimesByDay: async (projectId) => {
+    const tasks = await taskRepository.get({ where: { projectId } })
+    const times = await db.times
+      .whereIn({ taskId: Object.keys(tasks) })
+      .toArray()
+
+    const timesByDay = groupBy(times, 'day')
+    const total = sum(
+      times.map((time) => time.duration),
+      'duration'
+    )
+
+    return { tasks, timesByDay, total }
+  },
 }
 
 export default projectRepository
+
+/*
+
+Data Access Layer
+
+  statisticsOnDay
+  statisticsOnProject
+  tasksWithTimes
+  projects
+
+have one repository
+
+  update
+  delete
+
+  updateTaskTimeOnDay
+
+*/

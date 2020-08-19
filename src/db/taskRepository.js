@@ -46,6 +46,14 @@ const taskRepository = {
       ? await db.times.where({ day, taskId }).modify({ duration })
       : await db.times.put({ day, duration, taskId })
   },
+
+  getOnDay: async (day) => {
+    day = startOfDay(day).getTime()
+
+    // get times where day
+    // get tasks in times
+    //
+  },
 }
 
 export default taskRepository

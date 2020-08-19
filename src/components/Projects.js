@@ -52,6 +52,11 @@ export default function Projects() {
                 <button onClick={() => setLocation('/' + id)}>>></button>
               </div>
               <div>
+                <button onClick={() => setLocation('/statistics/' + id)}>
+                  stats
+                </button>
+              </div>
+              <div>
                 <button onClick={() => attemptDelete(index)}>X</button>
               </div>
             </div>

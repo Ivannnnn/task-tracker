@@ -64,3 +64,42 @@ export const pluck = (arr, prop) => {
   if (arr.constructor !== Array) arr = Object.values(arr)
   return arr.map((obj) => obj[prop])
 }
+
+const createIndex = (arr, key) => {
+  const index = {}
+  arr.forEach((item, i) => {
+    index[item[key]] = index[item[key]] ? [...index[item[key]], i] : [i]
+  })
+  return index
+}
+
+export const relate = (data, relations) => {
+  const toArray = (d) => (d.constructor === Array ? d : Object.values(d))
+
+  relations.forEach((relation) => {
+    relation = relation.replace(/ +?/g, '').split('->')
+    const [
+      [parentName, parentKey],
+      [childName, childKey],
+    ] = relation.map((item) => item.split('.'))
+
+    const parentData = toArray(data[parentName])
+    const childData = toArray(data[childName])
+
+    const childByParentKey = createIndex(childData, childKey)
+
+    parentData.forEach((parent, i) => {
+      parent[childName] = (childByParentKey[parent[parentKey]] || []).map(
+        (childIndex) => childData[childIndex].id
+      )
+    })
+  })
+}
+
+export const groupBy = (xs, key) =>
+  xs.reduce(function (rv, x) {
+    ;(rv[x[key]] = rv[x[key]] || []).push(x)
+    return rv
+  }, {})
+
+export const sum = (arr) => arr.reduce((a, b) => a + b, 0)

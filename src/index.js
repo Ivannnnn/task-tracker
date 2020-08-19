@@ -4,6 +4,7 @@ import './styles.css'
 import Store from 'store'
 import Projects from 'components/Projects'
 import Tasks from 'components/Tasks'
+import Statistics from 'components/Statistics'
 import { Switch, Route } from 'wouter'
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
   return projectsLoaded ? (
     <Switch>
       <Route path="/" component={Projects} />
+      <Route path="/statistics/:projectId?" component={Statistics} />
       <Route path="/:projectId" component={Tasks} />
     </Switch>
   ) : null
