@@ -5,11 +5,11 @@ import Store from 'store'
 import Input from 'components/Input'
 import { classes, secsToTime, sortBy, arraySwap } from 'utils'
 import { useImmer, useInterval } from 'hooks'
-import db from 'services/db'
+import taskRepository from 'db/taskRepository'
 
 const Task = ({
   title,
-  time,
+  totalTime,
   estimate,
   active,
   UPDATE,
@@ -39,7 +39,7 @@ const Task = ({
       </div>
       <div>
         <button className="time" onClick={ON_TOGGLE_ACTIVE}>
-          {secsToTime(time)}
+          {secsToTime(totalTime)}
         </button>
       </div>
       <div>
@@ -59,13 +59,16 @@ export default function Tasks({ params: { projectId } }) {
   const [_, setLocation] = useLocation()
 
   const loadTasks = async () => {
-    const byId = await db.tasks.getBelongingTo(projectId)
+    const tasks = await taskRepository.get({
+      where: { projectId },
+      with: 'totalTime',
+    })
 
-    updateTasks((tasks) => {
-      tasks.byId = byId
-      tasks.ordered = sortBy(Object.values(byId), 'order').map(
-        (props) => props.id
-      )
+    updateTasks(() => {
+      return {
+        byId: tasks,
+        ordered: sortBy(Object.values(tasks), 'order').map((props) => props.id),
+      }
     })
   }
 
@@ -75,33 +78,31 @@ export default function Tasks({ params: { projectId } }) {
 
   const updateActiveTaskTime = () => {
     updateTasks((tasks) => {
-      tasks.byId[tasks.activeId].time++
+      tasks.byId[tasks.activeId].totalTime++
       tasks.activeId &&
-        db.tasks.updateTime(tasks.activeId, tasks.byId[tasks.activeId].time)
+        taskRepository.updateTime(
+          tasks.activeId,
+          tasks.byId[tasks.activeId].totalTime
+        )
     })
   }
 
   useInterval(updateActiveTaskTime, tasks.activeId && 1000)
 
   const add = async () => {
-    const newTask = {
-      title: '',
-      estimate: 0,
-      time: 0,
-      belongsTo: projectId,
+    const newTask = await taskRepository.add({
+      projectId,
       order: tasks.ordered.length,
-    }
-
-    const id = await db.tasks.add(newTask)
-
+    })
+    newTask.totalTime = 0
     updateTasks(({ byId, ordered }) => {
-      byId[id] = newTask
-      ordered.push(id)
+      byId[newTask.id] = newTask
+      ordered.push(newTask.id)
     })
   }
 
   const UPDATE = (id) => async (props) => {
-    await db.tasks.update(id, props)
+    await taskRepository.update(id, props)
     updateTasks(({ byId }) => {
       Object.assign(byId[id], props)
     })
@@ -109,7 +110,7 @@ export default function Tasks({ params: { projectId } }) {
 
   const REMOVE = (index) => async () => {
     const id = tasks.ordered[index]
-    await db.tasks.remove(id)
+    await taskRepository.remove(id)
     updateTasks((tasks) => {
       delete tasks.byId[id]
       tasks.ordered.splice(index, 1)
@@ -123,8 +124,8 @@ export default function Tasks({ params: { projectId } }) {
     const prevId = tasks.ordered[index - 1]
 
     await Promise.all([
-      db.tasks.update(id, { order: index - 1 }),
-      db.tasks.update(prevId, { order: index }),
+      taskRepository.update(id, { order: index - 1 }),
+      taskRepository.update(prevId, { order: index }),
     ])
 
     updateTasks((tasks) => {
@@ -137,8 +138,8 @@ export default function Tasks({ params: { projectId } }) {
     const nextId = tasks.ordered[index + 1]
 
     await Promise.all([
-      db.tasks.update(id, { order: index + 1 }),
-      db.tasks.update(nextId, { order: index }),
+      taskRepository.update(id, { order: index + 1 }),
+      taskRepository.update(nextId, { order: index }),
     ])
 
     updateTasks((tasks) => {

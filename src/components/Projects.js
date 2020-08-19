@@ -10,7 +10,7 @@ export default function Projects() {
   const onAddNew = () => {
     const lastProject =
       projects.byId[projects.byOrder[projects.byOrder.length - 1]]
-    lastProject.title !== '' && actions.createProject()
+    ;(!lastProject || (lastProject || {}).title) && actions.createProject()
   }
 
   const attemptDelete = (id) => {

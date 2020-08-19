@@ -53,3 +53,14 @@ export const sortBy = (arr, key = false, ascOrDesc = 'asc') => {
 export function arraySwap(arr, from, to) {
   arr.splice(from, 1, arr.splice(to, 1, arr[from])[0])
 }
+
+export const forEach = (arrOrObj, cb) => {
+  arrOrObj.constructor === Array
+    ? arrOrObj.forEach(cb)
+    : Object.keys(arrOrObj).forEach((key) => cb(arrOrObj[key], key))
+}
+
+export const pluck = (arr, prop) => {
+  if (arr.constructor !== Array) arr = Object.values(arr)
+  return arr.map((obj) => obj[prop])
+}
