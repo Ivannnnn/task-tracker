@@ -1,7 +1,6 @@
 import React, { memo, useEffect } from 'react'
 import Estimate from 'components/Estimate'
 import { useLocation } from 'wouter'
-import Store from 'store'
 import Input from 'components/Input'
 import { classes, secsToTime, sortBy, arraySwap } from 'utils'
 import { useImmer, useInterval } from 'hooks'
@@ -55,7 +54,7 @@ export default function Tasks({ params: { projectId } }) {
     ordered: [],
     activeId: null,
   })
-  const { projects } = Store.useContainer()
+
   const [_, setLocation] = useLocation()
 
   const loadTasks = async () => {
@@ -73,8 +72,8 @@ export default function Tasks({ params: { projectId } }) {
   }
 
   useEffect(() => {
-    projects.byId[projectId] && loadTasks()
-  }, [projects.byId[projectId]])
+    loadTasks()
+  }, [])
 
   const updateActiveTaskTime = () => {
     updateTasks((tasks) => {
