@@ -7,6 +7,8 @@ import Tasks from 'components/Tasks'
 import Statistics from 'components/Statistics'
 import { Switch, Route } from 'wouter'
 
+import repository from 'db/repository'
+
 function App() {
   const { projectsLoaded, actions } = Store.useContainer()
 
@@ -29,3 +31,5 @@ ReactDOM.render(
   </Store.Provider>,
   document.getElementById('root')
 )
+
+repository.test()

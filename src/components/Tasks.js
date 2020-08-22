@@ -55,6 +55,9 @@ export default function Tasks({ params: { projectId } }) {
     ordered: [],
     activeId: null,
   })
+
+  console.log(JSON.stringify(tasks))
+
   const { projects } = Store.useContainer()
   const [_, setLocation] = useLocation()
 

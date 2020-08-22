@@ -59,21 +59,3 @@ const projectRepository = {
 }
 
 export default projectRepository
-
-/*
-
-Data Access Layer
-
-  statisticsOnDay
-  statisticsOnProject
-  tasksWithTimes
-  projects
-
-have one repository
-
-  update
-  delete
-
-  updateTaskTimeOnDay
-
-*/
