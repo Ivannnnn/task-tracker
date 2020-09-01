@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useImmer } from 'hooks'
 import { startOfDay } from 'utils'
-import projectRepository from 'db/projectRepository'
+import repository from 'db/repository'
 
 const yyyymmdd = (d) =>
   `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}-${(
@@ -55,7 +55,7 @@ function ByDay() {
 
 function ByProject({ id }) {
   useEffect(() => {
-    projectRepository.getTimesByDay(id)
+    repository.getTimesByDay(id)
 
     /*
       db.projects.getTimesByDay(id).then((times) => {

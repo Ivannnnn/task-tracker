@@ -14,12 +14,6 @@ export const secsToTime = (secs) => {
   return [hh === '00' ? null : hh, mm, ss].filter(Boolean).join(':')
 }
 
-export function uuid(a) {
-  return a
-    ? (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)
-    : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, uuid)
-}
-
 export function keyBy(collection, key) {
   const result = {}
   collection.forEach((item) => {
@@ -54,17 +48,6 @@ export function arraySwap(arr, from, to) {
   arr.splice(from, 1, arr.splice(to, 1, arr[from])[0])
 }
 
-export const forEach = (arrOrObj, cb) => {
-  arrOrObj.constructor === Array
-    ? arrOrObj.forEach(cb)
-    : Object.keys(arrOrObj).forEach((key) => cb(arrOrObj[key], key))
-}
-
-export const pluck = (arr, prop) => {
-  if (arr.constructor !== Array) arr = Object.values(arr)
-  return arr.map((obj) => obj[prop])
-}
-
 const createIndex = (arr, key) => {
   const index = {}
   arr.forEach((item, i) => {
@@ -96,10 +79,15 @@ export const relate = (data, relations) => {
   })
 }
 
-export const groupBy = (xs, key) =>
-  xs.reduce(function (rv, x) {
-    ;(rv[x[key]] = rv[x[key]] || []).push(x)
-    return rv
+export const pick = (props, keys) =>
+  keys.reduce((acc, key) => {
+    return { ...acc, [key]: props[key] }
   }, {})
 
-export const sum = (arr) => arr.reduce((a, b) => a + b, 0)
+export const pluck = (arr, prop) => {
+  if (arr.constructor !== Array) arr = Object.values(arr)
+  return arr.map((obj) => obj[prop])
+}
+
+export const intersect = (array1, array2) =>
+  array1.filter((value) => !array2.includes(value))
