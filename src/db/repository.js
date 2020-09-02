@@ -1,9 +1,47 @@
 import db from './db'
-import { startOfDay, relate, pick } from 'utils'
+import { startOfDay, relate, pick, pluck } from 'utils'
 
 export default {
-  getStatisticsOnDay: () => {},
-  getStatisticsOnProject: () => {},
+  getStatisticsOnDay: async (day) => {
+    day = startOfDay(day).getTime()
+
+    const times = await db.times.where({ day }).keyBy('id')
+    const tasks = await db.tasks
+      .whereIn({ id: pluck(times, 'taskId') })
+      .keyBy('id')
+    const projects = await db.projects
+      .whereIn({
+        id: pluck(tasks, 'projectId'),
+      })
+      .keyBy('id')
+
+    relate({ projects, tasks, times }, [
+      'projects.id -> tasks.projectId',
+      'tasks.id -> times.taskId',
+    ])
+
+    return {
+      ids: Object.keys(projects),
+      entities: { projects, tasks, times },
+    }
+  },
+  getStatisticsBelongingToProject: async (projectId) => {
+    const projects = await db.projects.where({ id: projectId }).keyBy('id')
+    const tasks = await db.tasks.where({ projectId }).keyBy('id')
+    const times = await db.times
+      .whereIn({ taskId: pluck(tasks, 'id') })
+      .keyBy('id')
+
+    relate({ projects, tasks, times }, [
+      'projects.id -> tasks.projectId',
+      'tasks.id -> times.taskId',
+    ])
+
+    return {
+      ids: Object.keys(projects),
+      entities: { projects, tasks, times },
+    }
+  },
   getAllProjects: () => db.projects.toArray(),
   addProject: (props) => {
     return db.projects.add(props)

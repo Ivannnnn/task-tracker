@@ -178,6 +178,9 @@ function Tasks({
   return (
     <div>
       <button onClick={() => redirect('/')}>{'<<<<'}</button>
+      <button onClick={() => redirect(`statistics/${project.id}`)}>
+        stats
+      </button>
       <h3>{project.title}</h3>
 
       <div className="list task-list">{tasks.map(renderTask)}</div>

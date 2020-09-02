@@ -67,7 +67,7 @@ export const useOrderable = (orderBy) => {
       })
     })
   }
-  function move(direction, targetIndex, updatedCb = () => {}) {
+  function move(direction, targetIndex) {
     const revert = () => updateItems(() => items)
     return new Promise((resolve) => {
       const strategy = {
