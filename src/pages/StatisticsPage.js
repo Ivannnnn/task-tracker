@@ -55,8 +55,6 @@ function ByDay() {
 
 function ByProject({ id }) {
   useEffect(() => {
-    repository.getTimesByDay(id)
-
     /*
       db.projects.getTimesByDay(id).then((times) => {
         console.log(times)

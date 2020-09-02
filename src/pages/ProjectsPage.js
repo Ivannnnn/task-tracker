@@ -28,7 +28,7 @@ export default function Container() {
       direction,
       index
     )
-    Promise.all([
+    return Promise.all([
       repository.updateProject(firstProject),
       repository.updateProject(secondProject),
     ]).catch(revert)
@@ -36,7 +36,7 @@ export default function Container() {
   async function createProject() {
     const newProject = new Project()
     const [order, revert] = await projectMethods.add(newProject)
-    repository.addProject({ ...newProject, order }).catch(revert)
+    return repository.addProject({ ...newProject, order }).catch(revert)
   }
 
   const redirect = (path) => setLocation(path)
@@ -64,9 +64,8 @@ function Projects({
   createProject,
 }) {
   function handleAddNew() {
-    //const last = projectCollection.getLast()
-    //if (!last || last.title !== '') controller.createProject()
-    createProject()
+    const last = projects[projects.length - 1]
+    if (!last || last.title !== '') createProject()
   }
 
   function handleDelete(index) {

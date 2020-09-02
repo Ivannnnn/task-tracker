@@ -1,5 +1,5 @@
 import db from './db'
-import { relate } from 'utils'
+import { startOfDay, relate, pick } from 'utils'
 
 export default {
   getStatisticsOnDay: () => {},
@@ -16,7 +16,7 @@ export default {
       const taskIds = await db.tasks.where({ projectId: id }).primaryKeys()
       return Promise.all([
         db.projects.delete(id),
-        db.tasks.delete(taskIds),
+        db.tasks.whereIn({ id: taskIds }).delete(),
         db.times.whereIn({ taskId: taskIds }).delete(),
       ])
     })
@@ -24,7 +24,7 @@ export default {
 
   async getTasksWithTimesBelongingToProject(projectId) {
     const projects = await db.projects.where({ id: projectId }).keyBy('id')
-    const tasks = await db.tasks.keyBy('id')
+    const tasks = await db.tasks.where({ projectId }).keyBy('id')
     const times = await db.times
       .whereIn({ taskId: Object.keys(tasks) })
       .keyBy('id')
@@ -45,7 +45,9 @@ export default {
   },
 
   updateTask({ id, ...props }) {
-    return db.tasks.where({ id }).modify(props)
+    return db.tasks
+      .where({ id })
+      .modify(pick(props, ['estimate', 'order', 'title', 'projectId']))
   },
   removeTask({ id }) {
     return db.transaction('rw', db.tasks, db.times, async () => {
@@ -55,5 +57,12 @@ export default {
       ])
     })
   },
-  updateTasksDailyTime() {},
+  async updateTaskDailyTime({ id: taskId, time }) {
+    const day = startOfDay(new Date()).getTime()
+    const existing = await db.times.where({ taskId, day }).first()
+
+    return existing
+      ? await db.times.where({ day, taskId }).modify({ duration: time.today })
+      : await db.times.put({ day, duration: time.today, taskId })
+  },
 }

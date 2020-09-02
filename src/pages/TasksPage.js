@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
 import Estimate from 'components/Estimate'
 import Input from 'components/Input'
-import { classes, secsToTime } from 'utils'
+import { classes, secsToTime, startOfDay } from 'utils'
 import { useLocation } from 'wouter'
-import { useImmer, useOrderable } from 'hooks'
+import { useInterval, useImmer, useOrderable } from 'hooks'
 import repository from 'db/repository'
 import Task from 'db/models/TaskModel'
 
@@ -11,14 +11,28 @@ export default function Container({ params: { projectId } }) {
   const [_, setLocation] = useLocation()
   const [project, updateProject] = useImmer({})
   const [tasks, tasksMethods] = useOrderable('order')
+  const [activeTaskIndex, updateActiveTaskIndex] = useImmer(null)
 
   function mapData({ ids, entities }) {
+    const isToday = (time) => time.day === startOfDay(new Date()).getTime()
     const project = entities.projects[ids[0]]
     const tasks = project.tasks.map((id) => {
       const task = entities.tasks[id]
-      task.totalTime = task.times.reduce((acc, timeId) => {
-        return acc + entities.times[timeId].duration
-      }, 0)
+      task.time = task.times.reduce(
+        ({ total, today }, timeId) => {
+          const time = entities.times[timeId]
+          if (isToday(time)) {
+            return {
+              total: total + time.duration,
+              today: today + time.duration,
+            }
+          } else {
+            return { total: total + time.duration, today }
+          }
+        },
+        { total: 0, today: 0 }
+      )
+
       delete task.times
       return task
     })
@@ -36,9 +50,23 @@ export default function Container({ params: { projectId } }) {
     })()
   }, [])
 
+  useInterval(updateActiveTaskTime, activeTaskIndex !== null && 1000)
+
+  async function updateActiveTaskTime() {
+    const time = tasks[activeTaskIndex].time
+    const [task, revert] = await tasksMethods.update(activeTaskIndex, {
+      time: {
+        today: time.today + 1,
+        total: time.total + 1,
+      },
+    })
+
+    return repository.updateTaskDailyTime(task).catch(revert)
+  }
+
   async function updateTask(index, props) {
     const [task, revert] = await tasksMethods.update(index, props)
-    repository.updateTask(task).catch(revert)
+    return repository.updateTask(task).catch(revert)
   }
 
   async function moveTask(direction, index) {
@@ -46,7 +74,7 @@ export default function Container({ params: { projectId } }) {
       direction,
       index
     )
-    Promise.all([
+    return Promise.all([
       repository.updateTask(firstTask),
       repository.updateTask(secondTask),
     ]).catch(revert)
@@ -54,16 +82,26 @@ export default function Container({ params: { projectId } }) {
 
   async function removeTask(index) {
     const [item, revert] = await tasksMethods.remove(index)
-    repository.removeTask(item).catch(revert)
+    if (index === activeTaskIndex) updateActiveTaskIndex(() => null)
+    return repository.removeTask(item).catch(revert)
   }
 
   async function createTask() {
     const newTask = new Task({ projectId })
-    const [order, revert] = await tasksMethods.add(newTask)
-    repository.addTask({ ...newTask, order }).catch(revert)
+    const [order, revert] = await tasksMethods.add({
+      ...newTask,
+      time: { total: 0, today: 0 },
+    })
+    return repository.addTask({ ...newTask, order }).catch(revert)
   }
 
   const redirect = (path) => setLocation(path)
+
+  const activateTask = (index) => updateActiveTaskIndex(() => index)
+  const deactivateTask = (index) =>
+    updateActiveTaskIndex((currentlyActive) =>
+      currentlyActive === index ? null : index
+    )
 
   return (
     <Tasks
@@ -75,6 +113,9 @@ export default function Container({ params: { projectId } }) {
         moveTask,
         createTask,
         removeTask,
+        activeTaskIndex,
+        activateTask,
+        deactivateTask,
       }}
     />
   )
@@ -88,11 +129,13 @@ function Tasks({
   moveTask,
   createTask,
   removeTask,
+  activeTaskIndex,
+  activateTask,
+  deactivateTask,
 }) {
-  const [activeTask, updateActiveTask] = useImmer(null)
-
-  function renderTask({ id, title, estimate, totalTime }, index) {
-    const active = activeTask && activeTask.id === id
+  function renderTask(task, index) {
+    const { id, title, estimate, time } = task
+    const active = activeTaskIndex === index
 
     return (
       <div key={id} className={classes('row', { active })}>
@@ -119,9 +162,11 @@ function Tasks({
         <div>
           <button
             className="time"
-            onClick={() => updateActiveTask(active ? null : id)}
+            onClick={() =>
+              active ? deactivateTask(index) : activateTask(index)
+            }
           >
-            {secsToTime(totalTime)}
+            {secsToTime(time.total)}
           </button>
         </div>
         <div>
