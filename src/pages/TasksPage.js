@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import Estimate from 'components/Estimate'
 import Input from 'components/Input'
+import NotFound from 'components/NotFound'
 import { classes, secsToTime, startOfDay } from 'utils'
 import { useLocation } from 'wouter'
 import { useInterval, useImmer, useOrderable } from 'hooks'
@@ -16,6 +17,9 @@ export default function Container({ params: { projectId } }) {
   function mapData({ ids, entities }) {
     const isToday = (time) => time.day === startOfDay(new Date()).getTime()
     const project = entities.projects[ids[0]]
+
+    if (!project) return { project: null, tasks: [] }
+
     const tasks = project.tasks.map((id) => {
       const task = entities.tasks[id]
       task.time = task.times.reduce(
@@ -46,7 +50,7 @@ export default function Container({ params: { projectId } }) {
         await repository.getTasksWithTimesBelongingToProject(projectId)
       )
       tasksMethods.set(tasks)
-      updateProject(() => project)
+      updateProject(project)
     })()
   }, [])
 
@@ -103,7 +107,7 @@ export default function Container({ params: { projectId } }) {
       currentlyActive === index ? null : index
     )
 
-  return (
+  return project ? (
     <Tasks
       {...{
         redirect,
@@ -118,6 +122,8 @@ export default function Container({ params: { projectId } }) {
         deactivateTask,
       }}
     />
+  ) : (
+    <NotFound />
   )
 }
 

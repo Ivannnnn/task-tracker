@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useImmer } from 'hooks'
 import { groupBy } from 'utils'
 import repository from 'db/repository'
+import NotFound from 'components/NotFound'
 
 const yyyymmdd = (d) =>
   `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}-${(
@@ -113,26 +114,26 @@ function ByProject({ id }) {
     )
   }
 
-  return (
-    project && (
-      <div>
-        <h3>{project.title}</h3>
+  return project ? (
+    <div>
+      <h3>{project.title}</h3>
 
-        {Object.keys(taskTimesByDay).map((day) => {
-          const total = taskTimesByDay[day].reduce(
-            (acc, time) => acc + time.duration,
-            0
-          )
-          return (
-            <div key={day}>
-              <h4>{yyyymmdd(new Date(Number(day)))}</h4>
-              <h5>Total: {total}</h5>
-              {renderTasks(taskTimesByDay[day])}
-            </div>
-          )
-        })}
-      </div>
-    )
+      {Object.keys(taskTimesByDay).map((day) => {
+        const total = taskTimesByDay[day].reduce(
+          (acc, time) => acc + time.duration,
+          0
+        )
+        return (
+          <div key={day}>
+            <h4>{yyyymmdd(new Date(Number(day)))}</h4>
+            <h5>Total: {total}</h5>
+            {renderTasks(taskTimesByDay[day])}
+          </div>
+        )
+      })}
+    </div>
+  ) : (
+    <NotFound />
   )
 }
 
