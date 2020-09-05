@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useImmer } from 'hooks'
-import { groupBy, yyyymmdd } from 'utils'
+import { groupBy, yyyymmdd, secsToTime } from 'utils'
 import repository from 'db/repository'
 import NotFound from 'components/NotFound'
 
@@ -55,7 +55,7 @@ function ByProject({ project, taskTimesByDay }) {
         {tasks.map((task) => {
           return (
             <li key={task.id}>
-              {task.title}: {task.duration}
+              {task.title}: {secsToTime(task.duration)}
             </li>
           )
         })}
@@ -65,13 +65,13 @@ function ByProject({ project, taskTimesByDay }) {
 
   return (
     <div>
-      <h3>{project.title}</h3>
+      <h3>Statistics for "{project.title}"</h3>
 
       {Object.keys(taskTimesByDay).map((day) => {
         return (
           <div key={day}>
             <h4>{yyyymmdd(new Date(Number(day)))}</h4>
-            <h5>Total: {taskTimesByDay[day].total}</h5>
+            <h5>Total: {secsToTime(taskTimesByDay[day].total)}</h5>
             {renderTasks(taskTimesByDay[day].tasks)}
           </div>
         )

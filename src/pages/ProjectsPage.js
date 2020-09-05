@@ -106,7 +106,7 @@ function Projects({
 
   return (
     <div>
-      <button onClick={() => redirect('/statistics')}>Stats</button>
+      <button onClick={() => redirect('/statistics')}>Stats by day</button>
       <div className="list project-list">{projects.map(renderProject)}</div>
       <button onClick={handleAddNew}>Add</button>
     </div>
