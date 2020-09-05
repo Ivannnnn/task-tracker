@@ -97,3 +97,8 @@ export const groupBy = (xs, key) =>
     ;(rv[x[key]] = rv[x[key]] || []).push(x)
     return rv
   }, {})
+
+export const yyyymmdd = (d) =>
+  `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}-${(
+    '0' + d.getDate()
+  ).slice(-2)}`
