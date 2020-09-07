@@ -34,16 +34,16 @@ export const useOrderable = (orderBy) => {
   const [items, updateItems] = useImmer([])
 
   function set(data) {
-    updateItems(sortBy(data, orderBy))
+    updateItems(sortBy(data, orderBy, 'desc'))
   }
   function add(props) {
     return new Promise((resolve) => {
       const revert = () => updateItems(() => items)
       updateItems((items) => {
-        const lastItem = items[items.length - 1]
-        const orderValue = lastItem ? lastItem[orderBy] + 1 : 0
+        const firstItem = items[0]
+        const orderValue = firstItem ? firstItem[orderBy] + 1 : 0
         const item = { ...props, [orderBy]: orderValue }
-        items.push(item)
+        items.unshift(item)
         resolve([orderValue, revert])
       })
     })

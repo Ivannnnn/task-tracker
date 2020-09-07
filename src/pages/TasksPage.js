@@ -187,10 +187,12 @@ function Tasks({
       <button onClick={() => redirect(`statistics/${project.id}`)}>
         stats
       </button>
+      <br />
+      <br />
+      <button onClick={createTask}>Add new</button>
       <h3>{project.title}</h3>
 
       <div className="list task-list">{tasks.map(renderTask)}</div>
-      <button onClick={createTask}>Add new</button>
     </div>
   )
 }
