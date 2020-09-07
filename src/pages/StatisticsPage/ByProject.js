@@ -29,6 +29,13 @@ export default function Container({ id }) {
       }
     }
 
+    project.total = Object.values(taskTimesByDay).reduce(
+      (acc, { total }) => acc + total,
+      0
+    )
+
+    console.log(project)
+
     return {
       project,
       taskTimesByDay,
