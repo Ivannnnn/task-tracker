@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useImmer } from 'hooks'
-import { groupBy, yyyymmdd, secsToTime } from 'utils'
+import { groupBy, yyyymmdd, secsToTime, sortByKey } from 'utils'
 import repository from 'db/repository'
 import NotFound from 'components/NotFound'
 
@@ -13,7 +13,10 @@ export default function Container({ id }) {
   function mapData({ ids, entities }) {
     const project = entities.projects[ids[0]]
 
-    const taskTimesByDay = groupBy(Object.values(entities.times), 'day')
+    const taskTimesByDay = sortByKey(
+      groupBy(Object.values(entities.times), 'day'),
+      'desc'
+    )
 
     for (let day in taskTimesByDay) {
       taskTimesByDay[day] = {

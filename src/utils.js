@@ -36,11 +36,20 @@ export const classes = (...args) => {
     .join(' ')
 }
 
+const sortStrategies = {
+  asc: (a, b) => (a - b > 0 ? 1 : -1),
+  desc: (a, b) => (a - b < 0 ? 1 : -1),
+}
+
+export const sortByKey = (obj, ascOrDesc) => {
+  return Object.keys(obj)
+    .sort((a, b) => sortStrategies[ascOrDesc](a, b))
+    .reduce((acc, key) => ({ ...acc, [key]: obj[key] }), {})
+}
+
 export const sortBy = (arr, key = false, ascOrDesc = 'asc') => {
-  const multiplier = { asc: -1, desc: 1 }[ascOrDesc]
-  if (!multiplier) throw new Error('3rd parameter must be "asc" or "desc"!')
   return [...arr].sort((a, b) =>
-    (key ? a[key] : a) < (key ? b[key] : b) ? multiplier : multiplier * -1
+    sortStrategies[ascOrDesc](key ? a[key] : a, key ? b[key] : b)
   )
 }
 
