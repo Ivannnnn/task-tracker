@@ -55,19 +55,32 @@ function ByDay({ day, projects, total, onDayChange }) {
   function renderProject(project) {
     return (
       <div key={project.id}>
-        <h3>
-          {project.title} - <small>{secsToTime(project.total)}</small>
-        </h3>
-        <ul>{project.tasks.map(renderTask)}</ul>
+        <h3>{project.title}</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>task</th>
+              <th>time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {project.tasks.map(renderTask)}
+            <tr>
+              <td></td>
+              <td>{secsToTime(project.total)}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     )
   }
 
   function renderTask(task) {
     return (
-      <li key={task.id}>
-        {task.title}: {secsToTime(task.totalTime)}
-      </li>
+      <tr key={task.id}>
+        <td>{task.title}</td>
+        <td>{secsToTime(task.totalTime)}</td>
+      </tr>
     )
   }
 
@@ -80,8 +93,8 @@ function ByDay({ day, projects, total, onDayChange }) {
           value={day}
           onChange={(e) => onDayChange(e.target.value)}
         />
+        <small className="total">{secsToTime(total)}</small>
 
-        <h4>Total: {secsToTime(total)}</h4>
         <div>{projects.map((project) => renderProject(project))}</div>
       </div>
     )

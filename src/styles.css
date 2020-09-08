@@ -71,3 +71,31 @@ button {
 .project-list .row > div:nth-child(1) {
   flex-grow: 1;
 }
+
+small.total {
+  font-weight: normal;
+  border: 1px solid black;
+  font-size: 14px;
+  padding: 1px 3px;
+  margin-left: 6px;
+}
+
+table {
+  border-collapse: collapse;
+  margin-left: 16px;
+}
+
+table,
+th,
+td {
+  border: 1px solid black;
+  padding: 2px 6px;
+}
+
+tbody tr:last-child {
+  background: rgb(230, 230, 230);
+}
+
+th:first-child {
+  width: 120px;
+}

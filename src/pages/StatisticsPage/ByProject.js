@@ -34,8 +34,6 @@ export default function Container({ id }) {
       0
     )
 
-    console.log(project)
-
     return {
       project,
       taskTimesByDay,
@@ -57,29 +55,43 @@ export default function Container({ id }) {
 
 function ByProject({ project, taskTimesByDay }) {
   function renderTasks(tasks) {
-    return (
-      <ul>
-        {tasks.map((task) => {
-          return (
-            <li key={task.id}>
-              {task.title}: {secsToTime(task.duration)}
-            </li>
-          )
-        })}
-      </ul>
-    )
+    return tasks.map((task) => {
+      return (
+        <tr key={task.id}>
+          <td>{task.title}</td>
+          <td>{secsToTime(task.duration)}</td>
+        </tr>
+      )
+    })
   }
 
   return (
     <div>
-      <h3>Statistics for "{project.title}"</h3>
+      <h3>
+        Statistics for "{project.title}"
+        <small className="total">{secsToTime(project.total)}</small>
+      </h3>
 
       {Object.keys(taskTimesByDay).map((day) => {
         return (
           <div key={day}>
-            <h4>{yyyymmdd(new Date(Number(day)))}</h4>
-            <h5>Total: {secsToTime(taskTimesByDay[day].total)}</h5>
-            {renderTasks(taskTimesByDay[day].tasks)}
+            <h4>{yyyymmdd(new Date(Number(day)))} </h4>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>task</th>
+                  <th>time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {renderTasks(taskTimesByDay[day].tasks)}
+                <tr>
+                  <td></td>
+                  <td>{secsToTime(taskTimesByDay[day].total)}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         )
       })}
