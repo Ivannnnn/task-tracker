@@ -7,6 +7,7 @@ import { useLocation } from 'wouter'
 import { useInterval, useImmer, useOrderable } from 'hooks'
 import repository from 'db/repository'
 import Task from 'db/models/TaskModel'
+import ChildListObserver from 'components/ChildListObserver'
 
 export default function Container({ params: { projectId } }) {
   const [_, setLocation] = useLocation()
@@ -139,6 +140,14 @@ function Tasks({
   activateTask,
   deactivateTask,
 }) {
+  function handleCreate() {
+    if (tasks.length === 0 || tasks[0].title) createTask()
+  }
+
+  function focusFirstTask(mutations, target) {
+    target.children[0].querySelector('.task-title input').focus()
+  }
+
   function renderTask(task, index) {
     const { id, title, estimate, time } = task
     const active = activeTaskIndex === index
@@ -153,10 +162,13 @@ function Tasks({
             ↓
           </button>
         </div>
-        <div>
+        <div className="task-title">
           <Input
             value={title}
             onChange={(title) => updateTask(index, { title })}
+            onKeyPress={(e) =>
+              index === 0 && e.key === 'Enter' && handleCreate()
+            }
           />
         </div>
         <div>
@@ -181,6 +193,7 @@ function Tasks({
       </div>
     )
   }
+
   return (
     <div>
       <button onClick={() => redirect('/')}>{'<<<<'}</button>
@@ -189,10 +202,15 @@ function Tasks({
       </button>
       <br />
       <br />
-      <button onClick={createTask}>Add new</button>
       <h3>{project.title}</h3>
-
-      <div className="list task-list">{tasks.map(renderTask)}</div>
+      <button onClick={handleCreate}>Add new</button>
+      {tasks.length ? (
+        <ChildListObserver className="list task-list" onInsert={focusFirstTask}>
+          {tasks.map(renderTask)}
+        </ChildListObserver>
+      ) : (
+        <p>No tasks created yet.</p>
+      )}
     </div>
   )
 }
