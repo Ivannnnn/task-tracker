@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import Estimate from 'components/Estimate'
+import Estimate from 'components/Estimate/Estimate'
 import Input from 'components/Input'
 import NotFound from 'components/NotFound'
 import { classes, secsToTime, startOfDay } from 'utils'

@@ -1,4 +1,4 @@
-const padZero = (val, n) =>
+export const padZero = (val, n) =>
   val.toString().length > n ? val : ('0' + val).slice(n * -1)
 
 export const startOfDay = (date) =>
@@ -9,9 +9,8 @@ export const secsToTime = (secs) => {
     .toString()
     .substr(19, 2)
   const hh = padZero(Math.floor(secs / 60 / 60), 2)
-  const ss = padZero(secs % 60, 2)
 
-  return [hh === '00' ? null : hh, mm, ss].filter(Boolean).join(':')
+  return [hh, mm].join(':')
 }
 
 export function keyBy(collection, key) {
