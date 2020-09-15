@@ -38,11 +38,15 @@ export default function Container() {
 
   useEffect(() => {
     ;(async function () {
-      const { projects, total } = mapData(
-        await repository.getStatisticsOnDay(new Date(day))
-      )
-      updateProjects(projects)
-      updateTotal(total)
+      if (day) {
+        const { projects, total } = mapData(
+          await repository.getStatisticsOnDay(new Date(day))
+        )
+        updateProjects(projects)
+        updateTotal(total)
+      } else {
+        updateProjects([])
+      }
     })()
   }, [day])
 

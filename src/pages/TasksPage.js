@@ -197,7 +197,7 @@ function Tasks({
   return (
     <div>
       <button onClick={() => redirect('/')}>{'<<<<'}</button>
-      <button onClick={() => redirect(`statistics/${project.id}`)}>
+      <button onClick={() => redirect(`/statistics/${project.id}`)}>
         stats
       </button>
       <br />

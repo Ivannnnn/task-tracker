@@ -110,7 +110,11 @@ function Projects({
       <br />
       <br />
       <button onClick={handleAddNew}>Add</button>
-      <div className="list project-list">{projects.map(renderProject)}</div>
+      {projects.length ? (
+        <div className="list project-list">{projects.map(renderProject)}</div>
+      ) : (
+        <p>No projects created yet.</p>
+      )}
     </div>
   )
 }
