@@ -1,4 +1,5 @@
 import React from 'react'
+import * as serviceWorker from './serviceWorker'
 import ReactDOM from 'react-dom'
 import './styles.css'
 import ProjectsPage from 'pages/ProjectsPage'
@@ -17,3 +18,5 @@ function App() {
 }
 
 ReactDOM.render(<App />, document.getElementById('root'))
+
+//serviceWorker.register()
