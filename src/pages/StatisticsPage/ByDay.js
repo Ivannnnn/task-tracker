@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useImmer } from 'hooks'
 import repository from 'db/repository'
-import { yyyymmdd, secsToTime } from 'utils'
+import { yyyymmdd, secsToTime, classes } from 'utils'
+import Icon from 'components/Icon'
 
 export default function Container() {
   const [day, setDay] = useState(yyyymmdd(new Date()))
@@ -55,52 +56,64 @@ export default function Container() {
   )
 }
 
-function ByDay({ day, projects, total, onDayChange }) {
-  function renderProject(project) {
-    return (
-      <div key={project.id}>
-        <h3>{project.title}</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>task</th>
-              <th>time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {project.tasks.map(renderTask)}
-            <tr>
-              <td></td>
-              <td>{secsToTime(project.total)}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    )
-  }
+function Project({ title, total, tasks }) {
+  const [expanded, setExpanded] = useState(false)
 
-  function renderTask(task) {
+  function renderTask({ id, title, totalTime }) {
     return (
-      <tr key={task.id}>
-        <td>{task.title}</td>
-        <td>{secsToTime(task.totalTime)}</td>
+      <tr key={id} className={classes('border-b border-gray-200')}>
+        <td className="w-full">{title}</td>
+        <td>{secsToTime(totalTime)}</td>
       </tr>
     )
   }
-
   return (
-    projects && (
+    <div
+      className={classes(
+        'p-3 overflow-hidden shadow bg-white mb-3 cursor-pointer'
+      )}
+      style={{ height: expanded ? 'auto' : '44px' }}
+      onClick={() => setExpanded(!expanded)}
+    >
+      <div className="flex justify-between">
+        <div className="font-semibold">
+          {title}
+          <span className="text-sm text-gray-600 rounded-sm px-1 ml-2">
+            {secsToTime(total)}
+          </span>
+        </div>
+        <button>
+          <Icon type={expanded ? 'up' : 'down'} className="w-4" />
+        </button>
+      </div>
+
+      <table className="mt-2">
+        <tbody>{tasks.map(renderTask)}</tbody>
+      </table>
+    </div>
+  )
+}
+
+function ByDay({ day, projects, total, onDayChange }) {
+  return (
+    <div
+      className="container mx-auto pt-10 max-w-sm "
+      style={{ height: 'calc(100vh - 124px)' }}
+    >
       <div>
-        <h3>Statistics for:</h3>
         <input
           type="date"
+          className="w-full px-3 py-1 mb-8"
           value={day}
           onChange={(e) => onDayChange(e.target.value)}
         />
-        <small className="total">{secsToTime(total)}</small>
-
-        <div>{projects.map((project) => renderProject(project))}</div>
       </div>
-    )
+
+      {projects.map((props) => (
+        <Project key={props.id} {...props} />
+      ))}
+
+      <h2 className="text-xl ml-2">Total: {secsToTime(total)}</h2>
+    </div>
   )
 }

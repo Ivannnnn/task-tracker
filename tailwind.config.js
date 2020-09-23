@@ -1,6 +1,8 @@
 module.exports = {
-  purge: ['./src/**/*.jsx', './src/**/*.js'],
-  theme: {
-    extend: {},
+  purge: ['./public/index.html', './src/**/*.jsx', './src/**/*.js'],
+  theme: {},
+
+  variants: {
+    cursor: ({ after }) => after(['focus']),
   },
 }

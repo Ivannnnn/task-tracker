@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useImmer } from 'hooks'
-import { groupBy, yyyymmdd, secsToTime, sortByKey } from 'utils'
+import { groupBy, yyyymmdd, secsToTime, sortByKey, classes } from 'utils'
 import repository from 'db/repository'
 import NotFound from 'components/NotFound'
+import Icon from 'components/Icon'
 
 export default function Container({ id }) {
   const [{ project, taskTimesByDay }, updateState] = useImmer({
@@ -56,48 +57,56 @@ export default function Container({ id }) {
   )
 }
 
-function ByProject({ project, taskTimesByDay }) {
-  function renderTasks(tasks) {
-    return tasks.map((task) => {
-      return (
-        <tr key={task.id}>
-          <td>{task.title}</td>
-          <td>{secsToTime(task.duration)}</td>
-        </tr>
-      )
-    })
+function Day({ day, tasks, total }) {
+  const [expanded, setExpanded] = useState(false)
+
+  function renderTask({ title, duration }, i) {
+    return (
+      <tr key={i} className={classes('border-b border-gray-200')}>
+        <td className="w-full">{title}</td>
+        <td>{secsToTime(duration)}</td>
+      </tr>
+    )
   }
 
   return (
-    <div>
-      <h3>
-        Statistics for "{project.title}"
-        <small className="total">{secsToTime(project.total)}</small>
-      </h3>
+    <div
+      className={classes(
+        'max-w-sm p-3 overflow-hidden shadow bg-white mb-6 cursor-pointer'
+      )}
+      style={{ height: expanded ? 'auto' : '44px' }}
+      onClick={() => setExpanded(!expanded)}
+    >
+      <div className="flex justify-between">
+        <div className="font-semibold">
+          {yyyymmdd(new Date(Number(day)))}
+          <span className="text-sm text-gray-600 rounded-sm px-1 ml-2">
+            {secsToTime(total)}
+          </span>
+        </div>
+        <button>
+          <Icon type={expanded ? 'up' : 'down'} className="w-4" />
+        </button>
+      </div>
 
-      {Object.keys(taskTimesByDay).map((day) => {
-        return (
-          <div key={day}>
-            <h4>{yyyymmdd(new Date(Number(day)))} </h4>
+      <table className="mt-2">
+        <tbody>{tasks.map(renderTask)}</tbody>
+      </table>
+    </div>
+  )
+}
 
-            <table>
-              <thead>
-                <tr>
-                  <th>task</th>
-                  <th>time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {renderTasks(taskTimesByDay[day].tasks)}
-                <tr>
-                  <td></td>
-                  <td>{secsToTime(taskTimesByDay[day].total)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        )
-      })}
+function ByProject({ project, taskTimesByDay }) {
+  return (
+    <div
+      className="container mx-auto pt-10"
+      style={{ height: 'calc(100vh - 124px)' }}
+    >
+      <h1 className="text-xl ml-2 mb-4">Project: "{project.title}"</h1>
+
+      {Object.keys(taskTimesByDay).map((day) => (
+        <Day day={day} key={day} {...taskTimesByDay[day]} />
+      ))}
     </div>
   )
 }

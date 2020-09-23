@@ -7,7 +7,12 @@ function timeToSecs(time) {
   return hours * 60 * 60 + minutes * 60
 }
 
-export default function Estimate({ value: seconds, onChange }) {
+export default function Estimate({
+  value: seconds,
+  onChange,
+  className,
+  ...props
+}) {
   const ref = useRef()
 
   useEffect(() => {
@@ -16,5 +21,13 @@ export default function Estimate({ value: seconds, onChange }) {
     })
   }, [])
 
-  return <input type="text" ref={ref} defaultValue={secsToTime(seconds)} />
+  return (
+    <input
+      type="text"
+      ref={ref}
+      defaultValue={secsToTime(seconds)}
+      className={className}
+      {...props}
+    />
+  )
 }
